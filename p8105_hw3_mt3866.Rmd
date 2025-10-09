@@ -32,7 +32,18 @@ filter (n > 10000)
 
 ggplot(instacart_df_filtered, aes(x = n, y = aisle)) +
   geom_point ()
+
+```
+
+Create a table of 3 most popular items in three aisles:
+```{r}
+instacart_popular = instacart |>
+  filter (aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) |>
+  count(aisle, product_name)|>
+  group_by(aisle)|>
+  arrange(desc(n))|>
+  slice_head(n=3)
 ```
 
 Bullet points:
-There are 134 aisles. The aisles most ordered from are fresh vegetables, fresh fruits, packaged vegetables fruits, and yogurt.
+There are 134 aisles. The aisles most ordered from are fresh vegetables, fresh fruits, packaged vegetables fruits, and yogurt. The three most popular items purchased in the aisle "baking ingredients" was light brown sugar (499), pure baking soda (387), and cane sugar (336). The three most popular items purchased in the aisle dog food care were snack sticks chicken & rice recipe dog treats (30), organix chicken & brown rice recipe (28), and small dog biscuits (26). The three most popular items ordered in packaged vegetables fruits were organic baby spinach (9,784), organic raspberries (5,546), and organic blueberries (4,966).
