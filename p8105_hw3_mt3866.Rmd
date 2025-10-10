@@ -4,7 +4,7 @@ output: github_document
 date: "2025-10-03"
 ---
 
-##Question 1
+## Question 1
 
 Load the data:
 ```{r}
@@ -65,5 +65,38 @@ instacart_hour = instacart |>
 Bullet points (commenting on each):
 There are 134 aisles. The aisles most ordered from are fresh vegetables, fresh fruits, packaged vegetables fruits, and yogurt. The three most popular items purchased in the aisle "baking ingredients" was light brown sugar (499), pure baking soda (387), and cane sugar (336). The three most popular items purchased in the aisle dog food care were snack sticks chicken & rice recipe dog treats (30), organix chicken & brown rice recipe (28), and small dog biscuits (26). The three most popular items ordered in packaged vegetables fruits were organic baby spinach (9,784), organic raspberries (5,546), and organic blueberries (4,966). The mean hour of Sunday in which coffee ice cream was ordered was 13.8 and in which pink lady apples were ordered was 13.4. The mean hour of Monday in which coffee ice cream was ordered was 14.3 and in which pink lady apples were ordered was 11.4. The mean hour of Tuesday in which coffee ice cream was ordered was 15.4 and in which pink lady apples were ordered was 11.7. The mean hour of Wednesday in which coffee ice cream was ordered was 15.3 and in which pink lady apples were ordered was 14.2. The mean hour of Thursday in which coffee ice cream was ordered was 15.2 and in which pink lady apples were ordered was 11.6. The mean hour of Friday in which coffee ice cream was ordered was 12.3 and in which pink lady apples were ordered was 12.8. The mean hour of Saturday in which coffee ice cream was ordered was 13.8 and in which pink lady apples were ordered was 11.9.
 
-##Question 2
+## Question 2
+
+Import data, clean and tidy the datasets
+```{r}
+zori_df=
+read_csv("zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv") |>
+  pivot_longer(
+    ("2015-01-31":"2024-08-31"),
+    names_to = "month",
+    values_to = "price") |> 
+  janitor::clean_names() |> 
+  rename(zip_code = region_name) |> 
+  mutate(
+    month = as_date(month),
+    year = floor_date(month, unit = "year"),
+    zip_code = as.numeric(zip_code)) 
+
+zipcodes_df = 
+  read_csv("zillow_data/Zip Codes.csv") |> 
+  janitor::clean_names() |> 
+  filter(
+    !(zip_code == 10463 & county == "New York"),
+    !(zip_code == 11201 & county == "New York"))  |> 
+  mutate(
+    borough = case_match(
+      county,
+      "Bronx" ~ "Bronx",
+      "Kings" ~ "Brooklyn",
+      "New York" ~ "Manhattan",
+      "Queens" ~ "Queens",
+      "Richmond" ~ "Staten Island"
+    )
+  ) 
+```
 
