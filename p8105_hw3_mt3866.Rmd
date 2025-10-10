@@ -80,7 +80,17 @@ read_csv("zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv") |>
   mutate(
     month = as_date(month),
     year = floor_date(month, unit = "year"),
-    zip_code = as.numeric(zip_code)) 
+    zip_code = as.numeric(zip_code)) |> 
+  mutate(
+    borough = case_match(
+      county_name,
+      "Bronx County" ~ "Bronx",
+      "Kings County" ~ "Brooklyn",
+      "New York County" ~ "Manhattan",
+      "Queens County" ~ "Queens",
+      "Richmond County" ~ "Staten Island"
+    )
+  )
 
 zipcodes_df = 
   read_csv("zillow_data/Zip Codes.csv") |> 
@@ -98,5 +108,29 @@ zipcodes_df =
       "Richmond" ~ "Staten Island"
     )
   ) 
+```
+
+How many zip codes appeared 116 times, fewer than 10
+```{r}
+count(zori_df, zip_code)|> 
+filter(n==116)
+
+count(zori_df, zip_code)|> 
+filter(n<10)
+```
+There are no zip codes that appear in fewer than 10 months, but there are 149 zip codes that appear in all 116 months. This may be because Zillow is constantly taking data every month from the same zip codes due to them being populated with rentals. 
+
+Create a table showing average rental price each year
+```{r}
+zori_df |>
+select (borough, year, price) |>
+  drop_na(price)|>
+  mutate (year = as.numeric(substr(year, 1, 4)))|>
+  group_by (borough, year)|>
+  summarize(mean_price = mean (price))|>
+  pivot_wider(
+    names_from = year,
+    values_from = mean_price 
+  )
 ```
 
