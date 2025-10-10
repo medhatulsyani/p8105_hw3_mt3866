@@ -148,7 +148,41 @@ select (borough, year, price, zip_code) |>
     scale_x_continuous(breaks = 2015:2024) +
     facet_grid(. ~ borough) +
   labs(
-    title = "NYC Average Rental Prices Between 2015-2024 By Borough")
+    title = "NYC Average Rental Prices Between 2015-2024 By Borough",
+    x = "Year",
+    y = "Average Rental Price")
 ```
 
-Some significant elements in this plot are that the Bronx had the lowest rental prices in 2015 but as of 2024, they are reaching equivalent rental prices as the other boroughs. Manhattan used to be relatively similar to the other boroughs in 2015, but rental prices have climbed to include a big range of prices. Staten Island rental prices seem to have changed the least in comparison to the other 4 boroughs.
+Some significant elements in this plot are that the Bronx had the lowest average rental prices in 2015 but as of 2024, they are reaching equivalent average rental prices as the other boroughs. Manhattan used to be relatively similar to the other boroughs in 2015, but average rental prices have climbed to include a big range of prices. Staten Island average rental prices seem to have changed the least in comparison to the other 4 boroughs.
+
+Compute the average rental price in each zip code over each month of 2023:
+```{r}
+
+month_df = 
+  tibble(
+    month_num = 1:12,
+    month_abb = month.abb,
+    month = month.name
+  )
+
+zori_df |>
+select (borough, month, year, price, zip_code) |>
+    drop_na(price)|>
+    mutate (month = as_date (month),
+            year = as.numeric(substr(year, 1, 4)))|>
+    filter(year == 2023)|>
+    separate(month, into = c("year", "month_num", "day"), convert = TRUE) |>
+    group_by (zip_code, month_num, year, borough)|>
+    summarize(mean_price = mean (price, na.rm = TRUE)) |>
+    ggplot(aes(x = month_num, y = mean_price, color = borough)) +
+    geom_point (alpha=.5) +
+    theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5, size = 5)) +
+    scale_x_continuous(breaks = 1:12) +
+    facet_grid(. ~ borough) +
+  labs(
+    title = "NYC Average Rental Prices By Borough Each Month in 2023",
+    x = "Month",
+    y = "Average Rental Price")
+    
+```
+In 2023, the Bronx had the lowest average rental prices. The average rental prices in the Bronx were similar to Staten Island, but Staten Island had a smaller range of rental prices while it was vast in the Bronx. Manhattan had the highest average rental prices while Brooklyn had the second highest.
