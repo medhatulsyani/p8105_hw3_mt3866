@@ -8,6 +8,7 @@ date: "2025-10-03"
 
 Load the data:
 ```{r}
+library (patchwork)
 library(tidyverse)
 library(dplyr)
 library(p8105.datasets)
@@ -186,3 +187,48 @@ select (borough, month, year, price, zip_code) |>
     
 ```
 In 2023, the Bronx had the lowest average rental prices. The average rental prices in the Bronx were similar to Staten Island, but Staten Island had a smaller range of rental prices while it was vast in the Bronx. Manhattan had the highest average rental prices while Brooklyn had the second highest.
+
+Combine the two plots
+```{r}
+by_year = 
+zori_df |>
+select (borough, year, price, zip_code) |>
+    drop_na(price)|>
+    mutate (year = as.numeric(substr(year, 1, 4)))|>
+    group_by (zip_code, borough, year)|>
+    summarize(mean_price = mean (price, na.rm = TRUE))|>
+    ggplot(aes(x = year, y = mean_price, color = borough)) +
+    geom_point (alpha=.5) +
+    theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5, size = 7)) +
+    scale_x_continuous(breaks = 2015:2024) +
+    facet_grid(. ~ borough) +
+  labs(
+    title = "NYC Average Rental Prices Between 2015-2024 By Borough",
+    x = "Year",
+    y = "Average Rental Price")
+
+by_month_in_2023 = 
+zori_df |>
+select (borough, month, year, price, zip_code) |>
+    drop_na(price)|>
+    mutate (month = as_date (month),
+            year = as.numeric(substr(year, 1, 4)))|>
+    filter(year == 2023)|>
+    separate(month, into = c("year", "month_num", "day"), convert = TRUE) |>
+    group_by (zip_code, month_num, year, borough)|>
+    summarize(mean_price = mean (price, na.rm = TRUE)) |>
+    ggplot(aes(x = month_num, y = mean_price, color = borough)) +
+    geom_point (alpha=.5) +
+    theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5, size = 5)) +
+    scale_x_continuous(breaks = 1:12) +
+    facet_grid(. ~ borough) +
+  labs(
+    title = "NYC Average Rental Prices By Borough Each Month in 2023",
+    x = "Month",
+    y = "Average Rental Price")
+
+
+(by_year) / by_month_in_2023
+```
+
+
