@@ -122,7 +122,7 @@ There are no zip codes that appear in fewer than 10 months, but there are 149 zi
 
 Create a table showing average rental price each year
 ```{r}
-zori_df |>
+avgprice_df = zori_df |>
 select (borough, year, price) |>
   drop_na(price)|>
   mutate (year = as.numeric(substr(year, 1, 4)))|>
@@ -134,3 +134,21 @@ select (borough, year, price) |>
   )
 ```
 
+Create a average rental price plot
+```{r}
+zori_df |>
+select (borough, year, price, zip_code) |>
+    drop_na(price)|>
+    mutate (year = as.numeric(substr(year, 1, 4)))|>
+    group_by (zip_code, borough, year)|>
+    summarize(mean_price = mean (price, na.rm = TRUE))|>
+    ggplot(aes(x = year, y = mean_price, color = borough)) +
+    geom_point (alpha=.5) +
+    theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5, size = 7)) +
+    scale_x_continuous(breaks = 2015:2024) +
+    facet_grid(. ~ borough) +
+  labs(
+    title = "NYC Average Rental Prices Between 2015-2024 By Borough")
+```
+
+Some significant elements in this plot are that the Bronx had the lowest rental prices in 2015 but as of 2024, they are reaching equivalent rental prices as the other boroughs. Manhattan used to be relatively similar to the other boroughs in 2015, but rental prices have climbed to include a big range of prices. Staten Island rental prices seem to have changed the least in comparison to the other 4 boroughs.
