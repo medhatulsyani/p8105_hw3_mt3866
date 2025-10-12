@@ -231,4 +231,37 @@ select (borough, month, year, price, zip_code) |>
 (by_year) / by_month_in_2023
 ```
 
+## Question 3
+
+Import, tidy and merge the two datasets
+```{r}
+accelerometer_df=
+  read_csv("accelerometer_data/nhanes_accel.csv") |>
+    pivot_longer(
+    ("min1":"min1440"),
+    names_to = "minutes",
+    values_to = "mim_value") |> 
+  janitor::clean_names()
+
+demographic_df=
+  read_csv("accelerometer_data/nhanes_covar.csv", skip=4) |>
+  janitor::clean_names()
+
+merged_df=
+  full_join(accelerometer_df, demographic_df, by = "seqn")
+```
+
+filter the merged dataset and ensure variables make sense
+
+```{r}
+filtered_df = merged_df |>
+  filter (age > 21) |>
+  drop_na(seqn) |>
+  mutate(sex=factor (sex,
+         levels = c(1, 2),
+         labels = c("Male", "Female")))|>
+  mutate(education=factor (education,
+         levels = c(1, 2, 3),
+         labels = c("Less than high school", "High school equivalent", "More than high school")))
+```
 
