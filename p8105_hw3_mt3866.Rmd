@@ -313,3 +313,20 @@ print(activity_df)
 ```
 
 In all three categories of education, there is a general downward trend between aging and activity. As individuals age, their activity levels decrease. This applies to both men and women, however the smallest rate of change is observed in individuals who have obtained an education level that is more than high school.
+
+```{r}
+hour_df = filtered_df|>
+  mutate(minute_number = as.numeric(str_remove(minutes,"min")))|>
+    group_by(minute_number, sex, education)|>
+ggplot(aes(x = minute_number, y = mim_value, color = sex)) +
+    geom_point (alpha=.5) +
+    theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5, size = 10)) +
+    facet_grid(. ~ education) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Acitivity Per Minute",
+    x = "Minutes",
+    y = "Activity")
+print(hour_df)
+```
+In this plot, I can see that both men and females tend to exercise the most mid day in each category. In individuals who obtained education that is greater than high school, many males are more active towards the end of the day in comparison to the other education groups.
