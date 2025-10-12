@@ -292,3 +292,24 @@ select(age, sex, education)|>
     y = "Age")
 print(agedist_df)
 ```
+Commentary:
+When looking at the age range of 60+ in the high school equivalent category, more females had reached this level of educational attainment than males. In the younger generation of ages 20-40, more individuals including both males and females have attained a level of education that is greater than high school in comparison to education that is less than high school.
+
+```{r}
+activity_df = filtered_df|>
+  select(seqn, mim_value, age, sex, education)|>
+  group_by(seqn, sex, education, age)|>
+summarize(activity=sum(mim_value))|>
+ggplot(aes(x = age, y = activity, color = sex)) +
+    geom_point (alpha=.5) +
+    theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5, size = 10)) +
+    facet_grid(. ~ education) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Total Activity by Age, Sex & Education",
+    x = "Age",
+    y = "Activity")
+print(activity_df)
+```
+
+In all three categories of education, there is a general downward trend between aging and activity. As individuals age, their activity levels decrease. This applies to both men and women, however the smallest rate of change is observed in individuals who have obtained an education level that is more than high school.
